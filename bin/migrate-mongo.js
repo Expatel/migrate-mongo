@@ -75,6 +75,23 @@ program
   });
 
 program
+  .command("run [migration]")
+  .description("run specific idempotent migration. Migration will not be saved to change log")
+  .option("-f --file <file>", "use a custom config file")
+  .action((options, migration)=> {
+    global.options = options;
+    migrateMongo.database
+      .connect()
+      .then(db => migrateMongo.run(db, migration))
+      .then(() => {
+        process.exit(0);
+      })
+      .catch(err => {
+        handleError(err);
+      });
+  });
+
+program
   .command("down")
   .description("undo the last applied database migration")
   .option("-f --file <file>", "use a custom config file")

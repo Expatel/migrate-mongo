@@ -10,5 +10,10 @@ module.exports = {
     // TODO write the statements to rollback your migration (if possible)
     // Example:
     // return db.collection('albums').updateOne({artist: 'The Beatles'}, {$set: {blacklisted: false}});
-  }
+  },
+
+
+  // true, if migration could be run several times idempotently
+  // if true, the migration could be run with `migrate-mongo run {migration}`
+  idempotent: true
 };

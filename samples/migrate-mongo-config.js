@@ -2,10 +2,12 @@
 
 module.exports = {
   mongodb: {
-    // TODO Change (or review) the url to your MongoDB:
+    // TODO Change (or review) the url to your MongoDB
+    // Could be in form {"env":"ENVIRONMENT_VARIABLE"}
     url: "mongodb://localhost:27017",
 
     // TODO Change this to your database name:
+    // Could be in form {"env":"ENVIRONMENT_VARIABLE"}
     databaseName: "YOURDATABASENAME",
 
     options: {
