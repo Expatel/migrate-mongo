@@ -1,6 +1,6 @@
 {
   "name": "migrate-mongo",
-  "version": "5.0.1-expatel",
+  "version": "5.0.2-expatel",
   "description": "A database migration tool for MongoDB in Node",
   "main": "lib/migrate-mongo.js",
   "bin": {

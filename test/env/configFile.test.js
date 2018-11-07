@@ -147,4 +147,18 @@ describe("configFile", () => {
       configFile.readRaw = readRaw;
     }
   });
+
+  it("should return object on get()", done => {
+    const {readRaw} = configFile;
+    configFile.readRaw = () => ({test: {key: "value"}});
+    try {
+      process.env.ENV = "value";
+
+      expect(configFile.get("test").key).to.equal("value");
+      done();
+    }
+    finally {
+      configFile.readRaw = readRaw;
+    }
+  });
 });
