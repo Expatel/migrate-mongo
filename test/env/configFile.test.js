@@ -114,15 +114,16 @@ describe("configFile", () => {
 
     it("should be possible to override config with global.configOverrides", done => {
       const {readRaw} = configFile;
-      configFile.readRaw = () => ({});
+      configFile.readRaw = () => ({mongodb: {url: "initial url", databaseName: "initial databaseName"}});
       try {
         global.configOverrides = {
           mongodb: {
-            url: "my url"
+            url: "overridden url"
           }
         };
 
-        expect(configFile.get("mongodb.url")).to.equal("my url");
+        expect(configFile.get("mongodb.url")).to.equal("overridden url");
+        expect(configFile.get("mongodb.databaseName")).to.equal("initial databaseName");
         done();
       }
       finally {
