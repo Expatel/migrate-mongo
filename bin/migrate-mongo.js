@@ -49,7 +49,7 @@ program
       .create(description)
       .then(fileName =>
         console.log(
-          `Created: ${migrateMongo.config.read().migrationsDir}/${fileName}`
+          `Created: ${migrateMongo.config.get(migrateMongo.config.read(), "migrationsDir")}/${fileName}`
         )
       )
       .catch(err => handleError(err));
@@ -75,10 +75,10 @@ program
   });
 
 program
-  .command("run [migration]")
+  .command("run <migration>")
   .description("run specific idempotent migration. Migration will not be saved to change log")
   .option("-f --file <file>", "use a custom config file")
-  .action((options, migration)=> {
+  .action((migration, options)=> {
     global.options = options;
     migrateMongo.database
       .connect()
