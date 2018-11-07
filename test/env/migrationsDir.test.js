@@ -1,4 +1,4 @@
-const { expect } = require("chai");
+const {expect} = require("chai");
 const sinon = require("sinon");
 const proxyquire = require("proxyquire");
 
@@ -18,9 +18,7 @@ describe("migrationsDir", () => {
 
   function mockConfigFile() {
     return {
-      read: sinon.stub().returns({
-        migrationsDir: "migrations"
-      })
+      get: sinon.stub()
     };
   }
 
@@ -35,32 +33,28 @@ describe("migrationsDir", () => {
 
   describe("resolve()", () => {
     it("should use the configured relative migrations dir when a config file is available", () => {
-      configFile.read.returns({
-        migrationsDir: "custom-migrations-dir"
-      });
+      configFile.get.withArgs("migrationsDir").returns("custom-migrations-dir");
       expect(migrationsDir.resolve()).to.equal(
         path.join(process.cwd(), "custom-migrations-dir")
       );
     });
 
     it("should use the configured absolute migrations dir when a config file is available", () => {
-      configFile.read.returns({
-        migrationsDir: "/absolute/path/to/my/custom-migrations-dir"
-      });
+      configFile.get.withArgs('migrationsDir').returns("/absolute/path/to/my/custom-migrations-dir");
       expect(migrationsDir.resolve()).to.equal(
         "/absolute/path/to/my/custom-migrations-dir"
       );
     });
 
     it("should use the default migrations directory when no migrationsDir is specified in the config file", () => {
-      configFile.read.returns({});
+      configFile.get.returns(undefined);
       expect(migrationsDir.resolve()).to.equal(
         path.join(process.cwd(), "migrations")
       );
     });
 
     it("should use the default migrations directory when unable to read the config file", () => {
-      configFile.read.throws(new Error("Cannot read config file"));
+      configFile.get.throws(new Error("Cannot read config file"));
       expect(migrationsDir.resolve()).to.equal(
         path.join(process.cwd(), "migrations")
       );

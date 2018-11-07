@@ -1,4 +1,5 @@
-const { expect } = require("chai");
+/* eslint-disable no-underscore-dangle */
+const {expect} = require("chai");
 const sinon = require("sinon");
 const proxyquire = require("proxyquire");
 
@@ -16,7 +17,9 @@ describe("configFile", () => {
 
   beforeEach(() => {
     fs = mockFs();
-    configFile = proxyquire("../../lib/env/configFile", { "fs-extra": fs });
+    configFile = proxyquire("../../lib/env/configFile", {
+      "fs-extra": fs
+    });
   });
 
   describe("shouldExist()", () => {
@@ -69,11 +72,11 @@ describe("configFile", () => {
     });
   });
 
-  describe("read()", () => {
+  describe("get()", () => {
     it("should attempt to read the config file", done => {
       const configPath = path.join(process.cwd(), "migrate-mongo-config.js");
       try {
-        configFile.read();
+        configFile.get("mongodb.databaseName");
         expect.fail("Error was not thrown");
       } catch (err) {
         expect(err.message).to.equal(`Cannot find module '${configPath}'`);
@@ -82,9 +85,9 @@ describe("configFile", () => {
     });
 
     it("should be possible to read a custom, absolute config file path", done => {
-      global.options = { file: "/some/absoluete/path/to/a-config-file.js" };
+      global.options = {file: "/some/absoluete/path/to/a-config-file.js"};
       try {
-        configFile.read();
+        configFile.get("mongodb.databaseName");
         expect.fail("Error was not thrown");
       } catch (err) {
         expect(err.message).to.equal(
@@ -95,15 +98,52 @@ describe("configFile", () => {
     });
 
     it("should be possible to read a custom, relative config file path", done => {
-      global.options = { file: "./a/relative/path/to/a-config-file.js" };
+      global.options = {file: "./a/relative/path/to/a-config-file.js"};
       const configPath = path.join(process.cwd(), global.options.file);
       try {
-        configFile.read();
+        configFile.get("mongodb.databaseName");
         expect.fail("Error was not thrown");
       } catch (err) {
         expect(err.message).to.equal(`Cannot find module '${configPath}'`);
         done();
       }
+      finally {
+        global.options = undefined;
+      }
     });
+
+    it("should be possible to override config with global.configOverrides", done => {
+      const {readRaw} = configFile;
+      configFile.readRaw = () => ({});
+      try {
+        global.configOverrides = {
+          mongodb: {
+            url: "my url"
+          }
+        };
+
+        expect(configFile.get("mongodb.url")).to.equal("my url");
+        done();
+      }
+      finally {
+        configFile.readRaw = readRaw;
+        delete global.configOverrides;
+        global.options = undefined;
+      }
+    });
+  });
+
+  it("should resolve env settings on get()", done => {
+    const {readRaw} = configFile;
+    configFile.readRaw = () => ({test: {"env": "ENV"}});
+    try {
+      process.env.ENV = "value";
+
+      expect(configFile.get("test")).to.equal("value");
+      done();
+    }
+    finally {
+      configFile.readRaw = readRaw;
+    }
   });
 });

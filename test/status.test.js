@@ -29,9 +29,7 @@ describe("status", () => {
   function mockConfigFile() {
     return {
       shouldExist: sinon.stub().returns(Promise.resolve()),
-      read: sinon.stub().returns({
-        changelogCollectionName: "changelog"
-      })
+      get: sinon.stub().withArgs("changelogCollectionName").returns("changelog")
     };
   }
 

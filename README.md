@@ -55,9 +55,11 @@ Edit the migrate-mongo-config.js file. Make sure you change the mongodb url:
 module.exports = {
   mongodb: {
     // TODO Change (or review) the url to your MongoDB:
+    // Could be in form {"env":"ENVIRONMENT_VARIABLE"}
     url: "mongodb://localhost:27017",
 
     // TODO Change this to your database name:
+    // Could be in form {"env":"ENVIRONMENT_VARIABLE"}
     databaseName: "YOURDATABASENAME",
 
     options: {
@@ -68,9 +70,11 @@ module.exports = {
   },
 
   // The migrations dir, can be an relative or absolute path. Only edit this when really necessary.
+  // Could be in form {"env":"ENVIRONMENT_VARIABLE"}
   migrationsDir: "migrations",
 
   // The mongodb collection where the applied changes are stored. Only edit this when really necessary.
+  // Could be in form {"env":"ENVIRONMENT_VARIABLE"}
   changelogCollectionName: "changelog"
 };
 ````
@@ -273,9 +277,11 @@ Connect to a mongo database using the connection settings from the `migrate-mong
 const db = await database.connect();
 ```
 
-### `config.read() → JSON`
+### `config.get(path) → string|object`
 
-Read connection settings from the `migrate-mongo-config.js` file.
+Read configuration from the `migrate-mongo-config.js` file.
+Could be override with `global.configOverrides`.
+
 
 ```javascript
 const mongoConnectionSettings = config.read();

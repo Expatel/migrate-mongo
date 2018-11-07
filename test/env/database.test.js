@@ -1,6 +1,7 @@
-const { expect } = require("chai");
+const {expect} = require("chai");
 const sinon = require("sinon");
 const proxyquire = require("proxyquire");
+const _ = require("lodash");
 
 describe("database", () => {
   let configObj;
@@ -24,14 +25,16 @@ describe("database", () => {
 
   function mockClient() {
     return {
-      db: sinon.stub().returns({ the: "db" }),
+      db: sinon.stub().returns({the: "db"}),
       close: "theCloseFnFromMongoClient"
     };
   }
 
   function mockConfigFile() {
     return {
-      read: sinon.stub().returns(configObj)
+      get(objPath) {
+        return _.get(configObj, objPath);
+      }
     };
   }
 
@@ -43,15 +46,16 @@ describe("database", () => {
     };
   }
 
-  beforeEach(() => {
+  beforeEach(function () {
+    this.timeout(10000);
     configObj = createConfigObj();
     client = mockClient();
     configFile = mockConfigFile();
     mongodb = mockMongodb();
 
     database = proxyquire("../../lib/env/database", {
+      "mongodb": mongodb,
       "./configFile": configFile,
-      mongodb
     });
   });
 
@@ -93,7 +97,7 @@ describe("database", () => {
       } catch (err) {
         expect(err.message).to.equal(
           "No `databaseName` defined in config file! This is required since migrate-mongo v3. " +
-            "See https://github.com/seppevs/migrate-mongo#initialize-a-new-project"
+          "See https://github.com/seppevs/migrate-mongo#initialize-a-new-project"
         );
       }
     });

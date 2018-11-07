@@ -1,4 +1,4 @@
-const { expect } = require("chai");
+const {expect} = require("chai");
 const sinon = require("sinon");
 const path = require("path");
 
@@ -28,7 +28,8 @@ describe("create", () => {
     };
   }
 
-  beforeEach(() => {
+  beforeEach(function () {
+    this.timeout(10000);
     migrationsDir = mockMigrationsDir();
     configFile = mockConfigFile();
     fs = mockFs();

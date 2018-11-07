@@ -49,7 +49,7 @@ program
       .create(description)
       .then(fileName =>
         console.log(
-          `Created: ${migrateMongo.config.get(migrateMongo.config.read(), "migrationsDir")}/${fileName}`
+          `Created: ${migrateMongo.config.get("migrationsDir")}/${fileName}`
         )
       )
       .catch(err => handleError(err));
