@@ -60,15 +60,23 @@ describe("up", () => {
   function mockConfigFile() {
     return {
       shouldExist: sinon.stub().returns(Promise.resolve()),
-      read: sinon.stub().returns({
-        changelogCollectionName: "changelog"
-      })
+      get: sinon.stub()
+        .withArgs("changelogCollectionName")
+        .returns("changelog")
+    };
+  }
+
+  function mockChangelogCollection() {
+    return {
+      insertOne: sinon.stub().returns(Promise.resolve())
     };
   }
 
   beforeEach(() => {
     idempotentMigration = mockMigration(true);
     nonIdempotentMigration = mockMigration(false);
+
+    changelogCollection = mockChangelogCollection();
 
     configFile = mockConfigFile();
     migrationsDir = mockMigrationsDir();
@@ -81,6 +89,28 @@ describe("up", () => {
     await run(db, IDEMPOTENT_MIGRATION_NAME);
     expect(idempotentMigration.up.called).to.equal(true);
   });
+
+
+  it("should save to changelog", async () => {
+    const clock = sinon.useFakeTimers(
+      new Date("2016-06-09T08:07:00.077Z").getTime()
+    );
+
+    try {
+      await run(db, IDEMPOTENT_MIGRATION_NAME);
+
+      expect(changelogCollection.insertOne.called).to.equal(true);
+      expect(changelogCollection.insertOne.callCount).to.equal(1);
+      expect(changelogCollection.insertOne.getCall(0).args[0]).to.deep.equal({
+        appliedAt: new Date("2016-06-09T08:07:00.077Z"),
+        fileName: "20181106183300-idempotent_migration.js",
+        method: "run"
+      });
+    } finally {
+      clock.restore();
+    }
+  });
+
 
   it("should not run idempotent migration", async () => {
 

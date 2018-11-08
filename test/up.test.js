@@ -1,4 +1,4 @@
-const { expect } = require("chai");
+const {expect} = require("chai");
 const sinon = require("sinon");
 
 const proxyquire = require("proxyquire");
@@ -136,15 +136,21 @@ describe("up", () => {
     const clock = sinon.useFakeTimers(
       new Date("2016-06-09T08:07:00.077Z").getTime()
     );
-    await up(db);
 
-    expect(changelogCollection.insertOne.called).to.equal(true);
-    expect(changelogCollection.insertOne.callCount).to.equal(2);
-    expect(changelogCollection.insertOne.getCall(0).args[0]).to.deep.equal({
-      appliedAt: new Date("2016-06-09T08:07:00.077Z"),
-      fileName: "20160607173840-first_pending_migration.js"
-    });
-    clock.restore();
+    try {
+      await up(db);
+
+      expect(changelogCollection.insertOne.called).to.equal(true);
+      expect(changelogCollection.insertOne.callCount).to.equal(2);
+      expect(changelogCollection.insertOne.getCall(0).args[0]).to.deep.equal({
+        appliedAt: new Date("2016-06-09T08:07:00.077Z"),
+        fileName: "20160607173840-first_pending_migration.js",
+        method: "up"
+      });
+    } finally {
+      clock.restore();
+    }
+
   });
 
   it("should yield a list of upgraded migration file names", async () => {
